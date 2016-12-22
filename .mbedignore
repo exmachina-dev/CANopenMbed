@@ -1,0 +1,16 @@
+LPC1768/*
+
+lib/CANopenNode/example/*
+lib/CANopenNode.old/*
+
+lib/CANopenNode/stack/drvTemplate/*
+lib/CANopenNode/stack/dsPIC30F/*
+lib/CANopenNode/stack/eCos/*
+lib/CANopenNode/stack/LPC177x_8x/*
+lib/CANopenNode/stack/MCF5282/*
+lib/CANopenNode/stack/PIC24_dsPIC33/*
+lib/CANopenNode/stack/PIC32/*
+lib/CANopenNode/stack/SAM3X/*
+lib/CANopenNode/stack/socketCAN/*
+lib/CANopenNode/stack/STM32/*
+lib/CANopenNode/stack/STM32F3/*

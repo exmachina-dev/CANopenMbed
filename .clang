@@ -1,0 +1,28 @@
+-isystem "C:\Program Files (x86)\GNU Tools ARM Embedded\5.4 2016q3\arm-none-eabi\include\c++\5.4.1"
+-isystem "C:\Program Files (x86)\GNU Tools ARM Embedded\5.4 2016q3\arm-none-eabi\include\c++\5.4.1\arm-none-eabi"
+-isystem "C:\Program Files (x86)\GNU Tools ARM Embedded\5.4 2016q3\arm-none-eabi\include\c++\5.4.1\backward"
+-isystem "C:\Program Files (x86)\GNU Tools ARM Embedded\5.4 2016q3\arm-none-eabi\include"
+-isystem "C:\Program Files (x86)\GNU Tools ARM Embedded\5.4 2016q3\arm-none-eabi\include-fixed"
+
+-isystem "D:\Users\WillyKaze\repos\mbed-os"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\platform"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\drivers"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\cmsis"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\hal"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\rtos"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\rtos\rtx"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\rtos\rtx\TARGET_CORTEX_M"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\targets\TARGET_NXP"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\targets\TARGET_NXP\TARGET_LPC176X"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\targets\TARGET_NXP\TARGET_LPC176X\device"
+-isystem "D:\Users\WillyKaze\repos\mbed-os\targets\TARGET_NXP\TARGET_LPC176X\TARGET_MBED_LPC1768"
+
+-I.
+-I OD\
+-I lib\CANopenNode
+-I lib\CANopenNode\stack
+-I lib\CANopenNode\stack\LPC1768
+
+-ferror-limit=100
+
+-D TOOLCHAIN_ARM_STD
