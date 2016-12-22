@@ -59,16 +59,7 @@ extern "C" {
 
 #include "MFE_helpers.h"
 
-#define USBTIN_DONGLE
-
-#ifdef USBTIN_DONGLE
-#define USBTIN_CAN (1)
-#define USBTIN_SERIAL_RX        p27
-#define USBTIN_SERIAL_TX        p28
-#include "USBtin.h"
-#else
 #include "debug.h"
-#endif
 
 #define TMR_TASK_INTERVAL   (1000)          /* Interval of tmrTask thread in microseconds */
 #define INCREMENT_1MS(var)  (var++)         /* Increment 1ms variable in tmrTask */
@@ -98,26 +89,12 @@ int main (void){
     wdog.kick(10); // First watchdog kick to trigger it
 
 
-#ifdef USBTIN_DONGLE
-    Thread tin_thread;
-    tin_thread.start(callback(UT_thread, NULL));
-#else
     USBport.baud(115200);
-#endif
 
     tmr_thread.start(callback(tmrTask_thread, NULL));
     app_thread.start(callback(appTask_thread, NULL));
 
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
-
-    /* Configure microcontroller. */
-    t.start();
-
-    /* initialize EEPROM */
-
-
-    /* increase variable each startup. Variable is stored in EEPROM. */
-    // OD_powerOnCounter++;
 
     while(reset != CO_RESET_APP){
         /* CANopen communication reset - initialize CANopen objects *******************/
@@ -134,9 +111,7 @@ int main (void){
 
         if(err != CO_ERROR_NO){
             ERRled = 1;
-#ifndef USBTIN_DONGLE
-            USBport.printf("ERR: %d", err);
-#endif
+
             while(1);
             /* CO_errorReport(CO->em, CO_EM_MEMORY_ALLOCATION_ERROR, CO_EMC_SOFTWARE_INTERNAL, err); */
         }
@@ -160,11 +135,11 @@ int main (void){
 
         wdog.kick(5); // Change watchdog timeout
 
-        while(reset == CO_RESET_NOT){
-            /* loop for normal program execution ******************************************/
+        while(reset == CO_RESET_NOT) {
+            /* loop for normal program execution */
+
             wdog.kick(); // Kick the watchdog
 
-            // USBport.printf("Main loop() %d\r\n", CO->NMT->operatingState);
             uint16_t timer1msCopy, timer1msDiff;
             timer1msCopy = CO_timer1ms;
             timer1msDiff = timer1msCopy - timer1msPrevious;
@@ -178,19 +153,18 @@ int main (void){
 
             programAysnc(timer1msDiff);
 
-            /* Process EEPROM */
-
             Thread::wait(1);
         }
     }
 
 
-    /* program exit ***************************************************************/
+    /* program exit */
     /* stop threads */
     HBled = 1;
     CANrunLed = 1;
     CANerrLed = 1;
     ERRled = 1;
+
     tmr_thread.terminate();
     app_thread.terminate();
 
@@ -249,7 +223,7 @@ static void appTask_thread(void const *args){
             uint32_t    readSize;
             MFEnode_t   node;
 
-#if (LPC_NODEID == 1) // If the LPC is the master
+#if (LPC_NODEID == 1) // If the LPC is the master node
             while (err != 0) {
                 CO->NMT->operatingState = CO_NMT_PRE_OPERATIONAL;
 
@@ -260,38 +234,22 @@ static void appTask_thread(void const *args){
                 err = MFE_scan(MFE_NODEID, &node, 100);
                 if (err) continue;
 
-#ifndef USBTIN_DONGLE
-                USBport.printf("AC : %d\r\n", err);
-#endif
-
                 err = MFE_connect(&node, 100);
 
                 CO->NMT->operatingState = CO_NMT_OPERATIONAL;
             }
 
-            // if(CO->NMT->operatingState == CO_NMT_PRE_OPERATIONAL) {
-            //  ERRled = true;
-            //  CO->NMT->operatingState = CO_NMT_OPERATIONAL;
-            // }
+            abortCode = 0;
+            readSize = 0;
+            err = CO_SDO_read(MFE_NODEID, 0x3f00, 0x01, dataRx, sizeof(dataRx), &abortCode, &readSize, 100);
+            if (readSize == 4) {
+                bfloat _temp = { .bytes = { dataRx[0], dataRx[1], dataRx[2], dataRx[3] << 0 }};
 
-            // OD_voltage[0] = CO_timer1ms & 127;
-            // USBport.printf("%d\r\n", CO->NMT->operatingState);
-            // OD_readInput8Bit[0] = CO_timer1ms & 0xF;
-            // Dport.write(cmsg);
-            // USBport.printf("CAN msg sent.\r\n");
-
-            // abortCode = 0;
-            // readSize = 0;
-            // err = CO_SDO_read(MFE_NODEID, 0x3f00, 0x01, dataRx, sizeof(dataRx), &abortCode, &readSize, 100);
-            // if (readSize == 4) {
-            //     bfloat _temp = { .bytes = { dataRx[0], dataRx[1], dataRx[2], dataRx[3] << 0 }};
-
-            //     // USBport.printf("READ ND 1: %x %x %x %x\r\n", dataRx[0], dataRx[1], dataRx[2], dataRx[3]);
-            //     // USBport.printf("READ ND 1: %f\r\n", _temp.to_float);
-            //     _temp.to_float += 10.0;
-            //     err = CO_SDO_write(MFE_NODEID, 0x3f00, 0x02, _temp.bytes, 4, &abortCode, 100);
-            //     USBport.printf("WRITE 3f80 2: %d %x\r\n", err, swapBytes(abortCode));
-            // }
+                USBport.printf("READ 3f00 1: %f\r\n", _temp.to_float);
+                _temp.to_float += 10.0;
+                err = CO_SDO_write(MFE_NODEID, 0x3f00, 0x02, _temp.bytes, 4, &abortCode, 100);
+                USBport.printf("WRITE 3f80 2: %d %x\r\n", err, swapBytes(abortCode));
+            }
 #endif
         }
 
@@ -305,7 +263,7 @@ void programAysnc(uint16_t timer1msDiff) {
 }
 
 
-/* CAN interrupt function *****************************************************/
+/* CAN interrupt function */
 void _CANInterruptHandler(void){
     CO_CANinterrupt(CO->CANmodule[0]);
 }

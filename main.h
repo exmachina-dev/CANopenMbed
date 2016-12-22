@@ -18,15 +18,8 @@ extern "C" {
 
 #define BUS_BITRATE     (500)
 
-#define COB_slave
-
-#ifdef COB_slave
-#define LPC_NODEID      (0x02)
-#define MFE_NODEID      (0x01)
-#else
 #define LPC_NODEID      (0x01)
-#define MFE_NODEID      (0x02)
-#endif
+#define SLV_NODEID      (0x02) // Tested with a MicroFlex e100
 
 int main(void);
 
