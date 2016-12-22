@@ -76,7 +76,6 @@ Timer t;
 extern "C" void mbed_reset();
 
 
-/* main ***********************************************************************/
 int main (void){
     HBled = 1;
     CANrunLed = 1;
@@ -179,7 +178,7 @@ int main (void){
 }
 
 
-/* timer thread executes in constant intervals ********************************/
+/* timer thread executes in constant intervals */
 static void tmrTask_thread(void const *args){
     while(true) {
 
@@ -227,27 +226,27 @@ static void appTask_thread(void const *args){
             while (err != 0) {
                 CO->NMT->operatingState = CO_NMT_PRE_OPERATIONAL;
 
-                CO_sendNMTcommand(CO, CO_NMT_RESET_NODE, MFE_NODEID);
+                CO_sendNMTcommand(CO, CO_NMT_RESET_NODE, SLV_NODEID);
 
                 Thread::wait(5000);
 
-                err = MFE_scan(MFE_NODEID, &node, 100);
+                err = SLV_scan(SLV_NODEID, &node, 100);
                 if (err) continue;
 
-                err = MFE_connect(&node, 100);
+                err = SLV_connect(&node, 100);
 
                 CO->NMT->operatingState = CO_NMT_OPERATIONAL;
             }
 
             abortCode = 0;
             readSize = 0;
-            err = CO_SDO_read(MFE_NODEID, 0x3f00, 0x01, dataRx, sizeof(dataRx), &abortCode, &readSize, 100);
+            err = CO_SDO_read(SLV_NODEID, 0x3f00, 0x01, dataRx, sizeof(dataRx), &abortCode, &readSize, 100);
             if (readSize == 4) {
                 bfloat _temp = { .bytes = { dataRx[0], dataRx[1], dataRx[2], dataRx[3] << 0 }};
 
                 USBport.printf("READ 3f00 1: %f\r\n", _temp.to_float);
                 _temp.to_float += 10.0;
-                err = CO_SDO_write(MFE_NODEID, 0x3f00, 0x02, _temp.bytes, 4, &abortCode, 100);
+                err = CO_SDO_write(SLV_NODEID, 0x3f00, 0x02, _temp.bytes, 4, &abortCode, 100);
                 USBport.printf("WRITE 3f80 2: %d %x\r\n", err, swapBytes(abortCode));
             }
 #endif
@@ -257,6 +256,7 @@ static void appTask_thread(void const *args){
     }
 }
 
+/* Led update thread */
 void programAysnc(uint16_t timer1msDiff) {
     CANrunLed = LED_GREEN_RUN(CO->NMT) ? true : false;
     CANerrLed = LED_RED_ERROR(CO->NMT) ? true : false;
