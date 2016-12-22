@@ -1,0 +1,4 @@
+[submodule "lib/CANopenNode"]
+	path = lib/CANopenNode
+	url = git@github.com:exmachina-dev/CANopenNode.git
+	branch = mbed
