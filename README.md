@@ -24,6 +24,6 @@ Compiled using the mbed toolkit and the mbed-cli tool. A tutorial is available
 
 # Links
 
-Original source code can be found at http:github.com/exmachina-dev/CANopenMbed.git
+Original source code can be found at [exmachina-dev/CANopenMbed](https://github.com/exmachina-dev/CANopenMbed)
 
-CANopenNode repository can be found [here](http:github.com/exmachina-dev/CANopenMbed.git) forked from [CANopenNode/CANopenNode](https://github.com/CANopenNode/CANopenNode/)
+CANopenNode repository can be found at [exmachina-dev/CANopenNode](https://github.com/exmachina-dev/CANopenNode) forked from [CANopenNode/CANopenNode](https://github.com/CANopenNode/CANopenNode/)
